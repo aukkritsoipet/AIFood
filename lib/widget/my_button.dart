@@ -1,8 +1,6 @@
 import 'package:aiproject/data/color_data.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
-
 class MyButton extends StatelessWidget{
   final String text;
   final double horizontalPadding;
