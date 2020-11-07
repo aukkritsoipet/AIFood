@@ -135,7 +135,7 @@ class _TakePhotoState extends State<TakePhoto> {
                   children: [
                     _buildImagePreview(_imageFile),
                     Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
+                      padding: EdgeInsets.only(top: 10.0),
                       child: Text("Last photo taken"),
                     ),
                   ],

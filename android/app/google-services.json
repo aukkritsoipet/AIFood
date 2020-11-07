@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "337151527966",
+    "firebase_url": "https://aiprojectfoodrecognition.firebaseio.com",
+    "project_id": "aiprojectfoodrecognition",
+    "storage_bucket": "aiprojectfoodrecognition.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:337151527966:android:24a6b64e4d1a0c0a58320f",
+        "android_client_info": {
+          "package_name": "com.example.aiproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "337151527966-lr7aum2kveqh0n1661rhnbdc3up2o9pf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSsiq95BUA3ngzGhjdPXycKpgJl8TPm00"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "337151527966-lr7aum2kveqh0n1661rhnbdc3up2o9pf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
