@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:aiproject/screen/result.dart';
 import 'package:aiproject/widget/ingredient_item.dart';
 import 'package:aiproject/widget/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:dio/dio.dart';
 
+// This import is for simulation only
 import 'dart:math';
 
 class TakePhoto extends StatefulWidget {
@@ -53,9 +57,9 @@ class _TakePhotoState extends State<TakePhoto> {
         _imageFile = File(shotImage.path);
       });
 
-      String imageLabel = _simulateAI();
+      String imageLabel = await _getPrediction();
       // TODO: _simulateAI() will be replaced with actual model's response later
-      _addIngredient(target: imageLabel);
+      _addIngredient(ingreName: imageLabel);
     }
   }
 
@@ -68,18 +72,36 @@ class _TakePhotoState extends State<TakePhoto> {
         _imageFile = File(shotImage.path);
       });
 
-      String imageLabel = _simulateAI();
+      String imageLabel = await _getPrediction();
       // TODO: _simulateAI() will be replaced with actual model's response later
-      _addIngredient(target: imageLabel);
+      _addIngredient(ingreName: imageLabel);
     }
   }
 
-  void _addIngredient({@required String target}) {
-    if (!ingredients.contains(target)) {
+  void _addIngredient({@required String ingreName}) {
+    if (!ingredients.contains(ingreName)) {
       setState(() {
-        ingredients.add(target);
+        ingredients.add(ingreName);
       });
     }
+  }
+
+  Future<String> _getPrediction() async {
+    print("upload");
+    String fileName = _imageFile.path.split('/').last;
+    
+    final url = Platform.isIOS ? "localhost" : '10.0.2.2';
+
+    FormData data = FormData.fromMap({
+      "file": await MultipartFile.fromFile(_imageFile.path,filename: fileName,),
+    });
+
+    Dio dio = new Dio();
+    
+    print("Upload to $url");
+    final res = await dio.post("http://$url:5000/upload", data: data);
+    final predictObj = json.decode(res.data);
+    return predictObj['class'];
   }
 
   // this function will later have File as parameter
