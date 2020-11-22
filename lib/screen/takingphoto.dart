@@ -17,7 +17,6 @@ class TakePhoto extends StatefulWidget {
 }
 
 class _TakePhotoState extends State<TakePhoto> {
-
   // Used for randomizing to simulate AI's work
   static const List<String> _dummyList = [
     "basil leaves",
@@ -40,14 +39,42 @@ class _TakePhotoState extends State<TakePhoto> {
   ];
 
   File _imageFile;
+  String _photoMessage = "Last photo taken";
 
   double screenWidth;
   double padding;
   double imageWidth;
 
+
   final _imgPicker = ImagePicker();
 
-  List<String> ingredients = [];
+  List<String> _ingredients = [];
+  bool _hasIngredient = false;
+
+  // List manipulating functions
+  void _addIngredient({@required String ingreName}) {
+    if (!_ingredients.contains(ingreName)) {
+      setState(() {
+        _ingredients.add(ingreName);
+        _hasIngredient = _ingredients.isNotEmpty;
+        _photoMessage = "Added $ingreName";
+      });
+    }
+    else{
+      setState(() {
+        _photoMessage = "You already have $ingreName";
+      });
+    }
+  }
+
+  void _removeIngredient({@required String target}) {
+    setState(() {
+      _ingredients.removeWhere((element) => element == target);
+      _hasIngredient = _ingredients.isNotEmpty;
+    });
+
+    print("Removed $target");
+  }
 
   Future _getCameraPhoto() async {
     PickedFile shotImage =
@@ -78,14 +105,6 @@ class _TakePhotoState extends State<TakePhoto> {
     }
   }
 
-  void _addIngredient({@required String ingreName}) {
-    if (!ingredients.contains(ingreName)) {
-      setState(() {
-        ingredients.add(ingreName);
-      });
-    }
-  }
-
   Future _getGalleryPhoto_noAI() async {
     PickedFile shotImage =
         await _imgPicker.getImage(source: ImageSource.gallery);
@@ -97,7 +116,6 @@ class _TakePhotoState extends State<TakePhoto> {
       Random random = Random();
       String imageLabel = _dummyList[random.nextInt(_dummyList.length)];
 
-      
       _addIngredient(ingreName: imageLabel);
     }
   }
@@ -123,14 +141,6 @@ class _TakePhotoState extends State<TakePhoto> {
 
     print("We got $predictObj");
     return predictObj['class'];
-  }
-
-  void _removeIngredient({@required String target}) {
-    setState(() {
-      ingredients.removeWhere((element) => element == target);
-    });
-
-    print("Removed $target");
   }
 
   Widget _buildImagePreview(File image) {
@@ -173,7 +183,7 @@ class _TakePhotoState extends State<TakePhoto> {
                     _buildImagePreview(_imageFile),
                     Padding(
                       padding: EdgeInsets.only(top: 10.0),
-                      child: Text("Last photo taken"),
+                      child: Text(_photoMessage),
                     ),
                   ],
                 ),
@@ -208,12 +218,12 @@ class _TakePhotoState extends State<TakePhoto> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ListView.builder(
-                      itemCount: ingredients.length,
+                      itemCount: _ingredients.length,
                       itemBuilder: (context, index) {
                         return IngredientItem(
-                            text: ingredients[index],
+                            text: _ingredients[index],
                             removeFunction: () =>
-                                _removeIngredient(target: ingredients[index]));
+                                _removeIngredient(target: _ingredients[index]));
                       }),
                 ),
               ),
@@ -222,16 +232,20 @@ class _TakePhotoState extends State<TakePhoto> {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: MyButton(
-                      text: "Get suggestions",
-                      horizontalPadding: 40,
-                      verticalPadding: 5,
-                      onpressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ResultPage(ingredients)));
-                      },
+                    child: Visibility(
+                      visible: _hasIngredient,
+                      child: MyButton(
+                        text: "Get suggestions",
+                        horizontalPadding: 40,
+                        verticalPadding: 5,
+                        onpressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ResultPage(_ingredients)));
+                        },
+                      ),
                     ),
                   ),
                 ),
