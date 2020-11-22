@@ -17,6 +17,7 @@ class TakePhoto extends StatefulWidget {
 }
 
 class _TakePhotoState extends State<TakePhoto> {
+
   // Used for randomizing to simulate AI's work
   static const List<String> _dummyList = [
     "basil leaves",
@@ -58,7 +59,6 @@ class _TakePhotoState extends State<TakePhoto> {
       });
 
       String imageLabel = await _getPrediction();
-      // TODO: _simulateAI() will be replaced with actual model's response later
       _addIngredient(ingreName: imageLabel);
     }
   }
@@ -73,7 +73,7 @@ class _TakePhotoState extends State<TakePhoto> {
       });
 
       String imageLabel = await _getPrediction();
-      // TODO: _simulateAI() will be replaced with actual model's response later
+
       _addIngredient(ingreName: imageLabel);
     }
   }
@@ -86,28 +86,43 @@ class _TakePhotoState extends State<TakePhoto> {
     }
   }
 
+  Future _getGalleryPhoto_noAI() async {
+    PickedFile shotImage =
+        await _imgPicker.getImage(source: ImageSource.gallery);
+
+    if (shotImage != null) {
+      setState(() {
+        _imageFile = File(shotImage.path);
+      });
+      Random random = Random();
+      String imageLabel = _dummyList[random.nextInt(_dummyList.length)];
+
+      
+      _addIngredient(ingreName: imageLabel);
+    }
+  }
+
   Future<String> _getPrediction() async {
-    print("upload");
+    print("Uploading");
     String fileName = _imageFile.path.split('/').last;
-    
+
     final url = Platform.isIOS ? "localhost" : '10.0.2.2';
 
     FormData data = FormData.fromMap({
-      "file": await MultipartFile.fromFile(_imageFile.path,filename: fileName,),
+      "file": await MultipartFile.fromFile(
+        _imageFile.path,
+        filename: fileName,
+      ),
     });
 
     Dio dio = new Dio();
-    
+
     print("Upload to $url");
     final res = await dio.post("http://$url:5000/upload", data: data);
     final predictObj = json.decode(res.data);
-    return predictObj['class'];
-  }
 
-  // this function will later have File as parameter
-  String _simulateAI() {
-    Random random = Random();
-    return _dummyList[random.nextInt(_dummyList.length)];
+    print("We got $predictObj");
+    return predictObj['class'];
   }
 
   void _removeIngredient({@required String target}) {
@@ -173,7 +188,6 @@ class _TakePhotoState extends State<TakePhoto> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: MyButton(
                           text: "From camera",
-                          onpressed: _getCameraPhoto,
                         ),
                       ),
                     ),
@@ -182,7 +196,7 @@ class _TakePhotoState extends State<TakePhoto> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: MyButton(
                           text: "From gallery",
-                          onpressed: _getGalleryPhoto,
+                          onpressed: _getGalleryPhoto_noAI,
                         ),
                       ),
                     ),

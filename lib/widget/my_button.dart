@@ -14,8 +14,14 @@ class MyButton extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
+
+      disabledColor: ColorData.buttonDisabledColor,
+      disabledTextColor: ColorData.buttonColor,
+
       color: ColorData.buttonColor,
-      textColor: ColorData.buttonTextColor, 
+      textColor: ColorData.buttonTextColor,
+      elevation: 5.0,
+
       onPressed: onpressed,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0)

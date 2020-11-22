@@ -7,4 +7,6 @@ class ColorData{
   static const buttonTextColor = Color(0xFFFFFFFF);
 
   static const ingredient_matched = Colors.green;
+
+  static const buttonDisabledColor = Color(0xffd1d1d1);
 }
