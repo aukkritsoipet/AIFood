@@ -20,29 +20,47 @@ class _ResultPageState extends State<ResultPage> {
 
   List<Map<String, dynamic>> menuList = [];
 
-  Future<void> _loadMenuList() async {
-    menuList = [];
-    
-    _ingreList = widget.ingredients;
+  bool _isSubsetOf(List child, List parent) {
+    if (child.length > parent.length) {
+      return false;
+    }
 
+    for (var ele in child) {
+      if (!parent.contains(ele)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  Future<void> _loadMenuList() async {
+    _ingreList = widget.ingredients;
+    print("List of what you have\n$_ingreList");
 
     Query query = Firestore.instance
         .collection("cookbook")
         .where("ingredients", arrayContainsAny: _ingreList);
     QuerySnapshot qShot = await query.getDocuments();
-    print(qShot.documents.length);
     qShot.documents.forEach((element) {
-      print(element.data);
       menuList.add(element.data);
     });
 
-    setState(() {
-       _isLoading = false;
+    print("Initial\n$menuList");
+
+    menuList.removeWhere((element) {
+      var requiredList = List<String>.from(element['ingredients']);
+      return !_isSubsetOf(requiredList, _ingreList);
     });
-   
+
+    print("After remove\n$menuList");
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
-  Widget _buildMenuItem(context, index) {
+  Widget _buildMenuCard(context, index) {
     Map<String, dynamic> menuObj = menuList[index];
     return MenuCard(menu: menuObj, ownedIngredients: _ingreList);
   }
@@ -60,7 +78,7 @@ class _ResultPageState extends State<ResultPage> {
       bottomNavigationBar: BottomAppBar(
         color: ColorData.buttonColor,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: padding, vertical: 10.0),
+          padding: EdgeInsets.symmetric(horizontal: padding, vertical: 7.0),
           child: Row(
             children: [
               Expanded(child: SizedBox()),
@@ -88,12 +106,21 @@ class _ResultPageState extends State<ResultPage> {
               color: ColorData.buttonColor,
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: menuList.length,
-                itemBuilder: (context, index) {
-                  return _buildMenuItem(context, index);
-                },
-              ),
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : menuList.isEmpty
+                      ? Center(
+                          child: Text(
+                              "Looks like we don't have suggestions for you"),
+                        )
+                      : ListView.builder(
+                          itemCount: menuList.length,
+                          itemBuilder: (context, index) {
+                            return _buildMenuCard(context, index);
+                          },
+                        ),
             ),
           ],
         ),

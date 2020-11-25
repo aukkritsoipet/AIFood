@@ -22,20 +22,25 @@ class _TakePhotoState extends State<TakePhoto> {
     "basil leaves",
     "carrot",
     "chili",
+    "chili paste",
     "chinese kale",
     "crispy pork belly",
+    "curry power",
     "egg",
+    "egg tofu",
+    "fish sauce",
     "garlic",
+    "glass noodle",
+    "instant noodle",
     "meat",
     "oil",
     "onion",
     "onion stalk",
-    "oyster sauce",
     "pepper",
     "rice",
     "soy paste",
-    "soy sauce",
-    "tomato"
+    "tomato",
+    "tomato sauce",
   ];
 
   File _imageFile;
@@ -45,10 +50,32 @@ class _TakePhotoState extends State<TakePhoto> {
   double padding;
   double imageWidth;
 
-
   final _imgPicker = ImagePicker();
 
-  List<String> _ingredients = [];
+  List<String> _ingredients = [
+    // "basil leaves",
+    // "carrot",
+    // "chili",
+    // "chili paste",
+    // "chinese kale",
+    // "crispy pork belly",
+    // "curry power",
+    // "egg",
+    // "egg tofu",
+    // "fish sauce",
+    // "garlic",
+    // "glass noodle",
+    // "instant noodle",
+    // "meat",
+    // "oil",
+    // "onion",
+    // "onion stalk",
+    // "pepper",
+    // "rice",
+    // "soy paste",
+    // "tomato",
+    // "tomato sauce",
+  ];
   bool _hasIngredient = false;
 
   // List manipulating functions
@@ -59,8 +86,7 @@ class _TakePhotoState extends State<TakePhoto> {
         _hasIngredient = _ingredients.isNotEmpty;
         _photoMessage = "Added $ingreName";
       });
-    }
-    else{
+    } else {
       setState(() {
         _photoMessage = "You already have $ingreName";
       });
@@ -198,6 +224,7 @@ class _TakePhotoState extends State<TakePhoto> {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: MyButton(
                           text: "From camera",
+                          onpressed: _getCameraPhoto,
                         ),
                       ),
                     ),
