@@ -50,13 +50,15 @@ class _TakePhotoState extends State<TakePhoto> {
   double padding;
   double imageWidth;
 
+  bool _imgPickerInUse = false;
+
   final _imgPicker = ImagePicker();
 
   List<String> _ingredients = [
     // "basil leaves",
     // "carrot",
     // "chili",
-    // "chili paste",
+    // "chilli paste",
     // "chinese kale",
     // "crispy pork belly",
     // "curry power",
@@ -70,6 +72,7 @@ class _TakePhotoState extends State<TakePhoto> {
     // "oil",
     // "onion",
     // "onion stalk",
+    // "egg",
     // "pepper",
     // "rice",
     // "soy paste",
@@ -78,12 +81,29 @@ class _TakePhotoState extends State<TakePhoto> {
   ];
   bool _hasIngredient = false;
 
+  void _lockImgPicker() {
+    setState(() {
+      _imgPickerInUse = true;
+    });
+  }
+
+  void _unlockImgPicker() {
+    setState(() {
+      _imgPickerInUse = false;
+    });
+  }
+
+  void _checkIngredients() {
+    setState(() {
+      _hasIngredient = _ingredients.isNotEmpty;
+    });
+  }
+
   // List manipulating functions
   void _addIngredient({@required String ingreName}) {
     if (!_ingredients.contains(ingreName)) {
       setState(() {
         _ingredients.add(ingreName);
-        _hasIngredient = _ingredients.isNotEmpty;
         _photoMessage = "Added $ingreName";
       });
     } else {
@@ -96,13 +116,14 @@ class _TakePhotoState extends State<TakePhoto> {
   void _removeIngredient({@required String target}) {
     setState(() {
       _ingredients.removeWhere((element) => element == target);
-      _hasIngredient = _ingredients.isNotEmpty;
     });
+    _checkIngredients();
 
     print("Removed $target");
   }
 
   Future _getCameraPhoto() async {
+    _lockImgPicker();
     PickedFile shotImage =
         await _imgPicker.getImage(source: ImageSource.camera);
 
@@ -114,9 +135,13 @@ class _TakePhotoState extends State<TakePhoto> {
       String imageLabel = await _getPrediction();
       _addIngredient(ingreName: imageLabel);
     }
+    _checkIngredients();
+    _unlockImgPicker();
   }
 
   Future _getGalleryPhoto() async {
+    _lockImgPicker();
+
     PickedFile shotImage =
         await _imgPicker.getImage(source: ImageSource.gallery);
 
@@ -129,9 +154,13 @@ class _TakePhotoState extends State<TakePhoto> {
 
       _addIngredient(ingreName: imageLabel);
     }
+    _checkIngredients();
+    _unlockImgPicker();
   }
 
-  Future _getGalleryPhoto_noAI() async {
+  Future _getGalleryPhotoNoAI() async {
+    _lockImgPicker();
+
     PickedFile shotImage =
         await _imgPicker.getImage(source: ImageSource.gallery);
 
@@ -144,6 +173,8 @@ class _TakePhotoState extends State<TakePhoto> {
 
       _addIngredient(ingreName: imageLabel);
     }
+    _checkIngredients();
+    _unlockImgPicker();
   }
 
   Future<String> _getPrediction() async {
@@ -216,43 +247,46 @@ class _TakePhotoState extends State<TakePhoto> {
               ),
               Expanded(
                 flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: MyButton(
-                          text: "From camera",
-                          onpressed: _getCameraPhoto,
-                        ),
+                child: _imgPickerInUse
+                    ? Center(
+                        child: Text("Processing..."),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: MyButton(
+                                text: "From camera",
+                                onpressed: _getCameraPhoto,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: MyButton(
+                                text: "From gallery",
+                                onpressed: _getGalleryPhotoNoAI,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: MyButton(
-                          text: "From gallery",
-                          onpressed: _getGalleryPhoto_noAI,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
               Expanded(
                 flex: 5,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListView.builder(
-                      itemCount: _ingredients.length,
-                      itemBuilder: (context, index) {
-                        return IngredientItem(
-                            text: _ingredients[index],
-                            removeFunction: () =>
-                                _removeIngredient(target: _ingredients[index]));
-                      }),
-                ),
+                child: ListView.builder(
+                    itemCount: _ingredients.length,
+                    itemBuilder: (context, index) {
+                      return IngredientItem(
+                          text: _ingredients[index],
+                          removeFunction: () =>
+                              _removeIngredient(target: _ingredients[index]));
+                    }),
               ),
               Expanded(
                 flex: 2,

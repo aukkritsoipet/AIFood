@@ -6,7 +6,6 @@ class MenuCard extends StatelessWidget {
 
   MenuCard({this.menu, this.ownedIngredients});
 
-
   String _capitalize(String text) {
     return text.substring(0, 1).toUpperCase() + text.substring(1, text.length);
   }
@@ -23,15 +22,7 @@ class MenuCard extends StatelessWidget {
       out.add(
         Padding(
             padding: EdgeInsets.symmetric(vertical: 5.0),
-            child: Row(
-              children: [
-                Expanded(child: Text(_capitalize(ingreName))),
-                Visibility(
-                  visible: ownedIngredients.contains(ingreName),
-                  child: Icon(Icons.check),
-                ),
-              ],
-            )),
+            child: Text(_capitalize(ingreName))),
       );
     });
 
@@ -46,8 +37,9 @@ class MenuCard extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              title: Text(menu["name"]),
+              title: Center(child: Text(menu["name"])),
               subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: _buildIngredientList(),
               ),
             ),
