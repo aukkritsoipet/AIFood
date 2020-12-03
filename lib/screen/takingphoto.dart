@@ -103,7 +103,7 @@ class _TakePhotoState extends State<TakePhoto> {
   void _addIngredient({@required String ingreName}) {
     if (!_ingredients.contains(ingreName)) {
       setState(() {
-        _ingredients.add(ingreName);
+        _ingredients.insert(0, ingreName);
         _photoMessage = "Added $ingreName";
       });
     } else {
@@ -158,6 +158,7 @@ class _TakePhotoState extends State<TakePhoto> {
     _unlockImgPicker();
   }
 
+  /// A fake AI function used for app testing
   Future _getGalleryPhotoNoAI() async {
     _lockImgPicker();
 
@@ -270,7 +271,7 @@ class _TakePhotoState extends State<TakePhoto> {
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: MyButton(
                                 text: "From gallery",
-                                onpressed: _getGalleryPhotoNoAI,
+                                onpressed: _getGalleryPhoto,
                               ),
                             ),
                           ),
